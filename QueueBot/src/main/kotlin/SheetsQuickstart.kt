@@ -17,11 +17,15 @@ import com.google.api.client.json.JsonFactory
 import com.google.api.services.sheets.v4.Sheets
 import java.io.File
 import java.io.InputStreamReader
+import java.util.*
 
 object SheetsQuickstart {
     private const val APPLICATION_NAME = "Google Sheets API Java Quickstart"
     private val JSON_FACTORY: JsonFactory = JacksonFactory.getDefaultInstance()
     private const val TOKENS_DIRECTORY_PATH = "tokens"
+    private const val SPREAD_SHEETS_ID = "1f2tmAL9QWZ2mf4x0VExjrJ0GwxfhJv6mnepjOQgEsTI"
+    private const val LIST_NAME = "queue"
+    private const val RANGE = "A1:E20"
 
     /**
      * Global instance of the scopes required by this quickstart.
@@ -62,23 +66,30 @@ object SheetsQuickstart {
     @JvmStatic
     fun main(args: Array<String>) {
         // Build a new authorized API client service.
+        val queues = getQueues();
+        if (queues != null) {
+            for (row in queues) {
+                println(row)
+            }
+        }
+    }
+
+    @Throws(IOException::class, GeneralSecurityException::class)
+    @JvmStatic
+    fun getQueues() : MutableList<MutableList<Any>>? {
         val HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport()
-        val spreadsheetId = "1I7qjF5SoWTbRXTJfs1xlOYUBkbcX0huOEq0Ly4JCt0k"
-        val range = "Лист1!A2:D2"
+        val range = "$LIST_NAME!$RANGE"
         val service = Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
             .setApplicationName(APPLICATION_NAME)
             .build()
-        val response = service.spreadsheets().values()[spreadsheetId, range]
+        val response = service.spreadsheets().values()[SPREAD_SHEETS_ID, range]
             .execute()
         val values = response.getValues()
         if (values == null || values.isEmpty()) {
             println("No data found.")
-        } else {
-            println("Name, Major")
-            for (row in values) {
-                // Print columns A and E, which correspond to indices 0 and 4.
-                System.out.printf("%s, %s\n", row[0], row[4])
-            }
         }
+        println(values)
+        return values;
     }
+
 }
