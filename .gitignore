@@ -2,4 +2,4 @@
 build/
 .gradle/
 .DS_STORE
-botInfo.properties
+QueueBot/src/main/resources/botInfo.properties

@@ -1,31 +1,74 @@
+import dev.inmo.tgbotapi.utils.extensions.escapeMarkdownV2Common
+
 class Table(data : MutableList<MutableList<Any>> ) {
-    val queues : MutableMap<String, MutableList<String>>
-    val teachers : MutableList<String>
+    private val queues : MutableMap<String, MutableList<String>> = mutableMapOf()
+    private val teachers : MutableList<String> = mutableListOf()
+
     init {
-        queues = mutableMapOf()
-        teachers = mutableListOf()
         for (teacher in data[1]) {
             queues.put(teacher as String, mutableListOf())
             teachers.add(teacher)
-            println(teacher)
         }
-        for (rowIndex in 4..data.size) {
+        for (rowIndex in 4 until data.size) {
             val row = data[rowIndex]
-            println(row)
-            for (teacherColumn in 0 until queues.size) {
-                val tchr = teachers[teacherColumn]
-                if (row[teacherColumn].equals(null)) {
-                    println("null")
+            for (teacherColumn in 0 until teachers.size) {
+                if (teacherColumn < row.size) {
+                    val tchr = teachers[teacherColumn]
+                    val cell = row[teacherColumn]
+                    if (cell.hashCode() != 0) {
+                        queues[tchr]?.add(row[teacherColumn] as String)
+                    }
+                } else {
+                    break
                 }
-                queues[tchr]?.add(row[teacherColumn] as String)
             }
         }
     }
     override fun toString() : String {
         var str = ""
         for ((key, value) in queues) {
-            str += key
+            str += "$key: "
             str += value
+            str += '\n'
+        }
+        return str
+    }
+
+    fun toMarkDownString() : String {
+        var str = ""
+        for ((key, _) in queues) {
+            str += getQueue(key)
+        }
+        return str
+    }
+
+    fun getQueue(name : String) : String {
+        var str = "*$name*: \n"
+        var index = 1;
+        for (student in queues[name]!!)
+            str += " #${index++} _$student\n_"
+        str += '\n'
+        return str
+    }
+
+    fun find(user : String) : String {
+        var str = ""
+        for (queue in queues) {
+            val index = queue.value.indexOf(user)
+            if (index != -1) {
+                str+= "You're *${1 + index}"
+                str+= when (1 + index) {
+                    1 -> "st "
+                    2 -> "nd "
+                    3 -> "rd "
+                    else -> "th "
+                }
+                str+= "*in order to *${queue.key}*\n"
+                break;
+            }
+        }
+        if (str.isEmpty()) {
+            str += "You're not found in any queue"
         }
         return str
     }

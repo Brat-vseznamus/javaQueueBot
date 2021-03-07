@@ -67,11 +67,11 @@ object SheetsQuickstart {
     fun main(args: Array<String>) {
         // Build a new authorized API client service.
         val queues = getQueues();
-        if (queues != null) {
-            for (row in queues) {
-                println(row)
-            }
-        }
+//        if (queues != null) {
+//            for (row in queues) {
+//                println(row)
+//            }
+//        }
     }
 
     @Throws(IOException::class, GeneralSecurityException::class)
@@ -88,7 +88,15 @@ object SheetsQuickstart {
         if (values == null || values.isEmpty()) {
             println("No data found.")
         }
-        println(values)
+//        for (row in values) {
+//            for (cell in row) {
+//                print(cell.javaClass)
+//                print(cell.toString())
+//                println(cell.hashCode())
+//            }
+//        }
+//        println(values)
+//        println(Table(values).toString())
         return values;
     }
 

@@ -4,12 +4,15 @@ import dev.inmo.tgbotapi.extensions.api.send.reply
 import dev.inmo.tgbotapi.extensions.api.send.sendTextMessage
 import dev.inmo.tgbotapi.bot.Ktor.telegramBot
 import dev.inmo.tgbotapi.extensions.api.bot.getMe
+import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContext
 import dev.inmo.tgbotapi.extensions.behaviour_builder.buildBehaviour
 import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onCommand
 import dev.inmo.tgbotapi.extensions.utils.asChannelChat
 import dev.inmo.tgbotapi.extensions.utils.formatting.linkMarkdownV2
 import dev.inmo.tgbotapi.extensions.utils.formatting.textMentionMarkdownV2
 import dev.inmo.tgbotapi.extensions.utils.updates.retrieving.startGettingFlowsUpdatesByLongPolling
+import dev.inmo.tgbotapi.types.BotCommand
+import dev.inmo.tgbotapi.types.ParseMode.Markdown
 import dev.inmo.tgbotapi.types.ParseMode.MarkdownV2
 import dev.inmo.tgbotapi.types.User
 import dev.inmo.tgbotapi.types.chat.abstracts.*
@@ -25,40 +28,20 @@ import java.util.*
  * The main purpose of this bot is just to answer "Oh, hi, " and add user mention here
  */
 suspend fun main(vararg args: String) {
-    val properties = Properties();
-    properties.load(FileInputStream("build/resources/main/botInfo.properties"))
-
-    val botToken = properties.getProperty("botInfo.token")
+    val botproperties = Properties();
+    botproperties.load(FileInputStream("build/resources/main/botInfo.properties"))
+    val botToken = botproperties.getProperty("botInfo.token")
     val bot = telegramBot(botToken)
     println(bot.getMe())
 
+//    val db = DB()
     val scope = CoroutineScope(Dispatchers.Default)
 
     bot.buildBehaviour(scope) {
         println(getMe())
-
-        onCommand("start") {
-//            println(it.content.text)
-
-            val chat = it.chat
-            val name = when (chat) {
-                is PrivateChat ->
-                    chat.firstName + " " + chat.lastName
-                else -> "who?"
-            }
-            reply(it, "Hi, $name:)")
-        }
-        onCommand("queue") {
-            var text = ""
-            println("!!!")
-            val data = SheetsQuickstart.getQueues()
-//            if (data != null) {
-//                Table(data)
-//            }
-//            text += table.toString()
-            println(data)
-            reply(it, "Queue: \n$data")
-        }
+        startCommand()
+        queueCommand()
+        findMeCommand()
     }
 
 
@@ -98,6 +81,8 @@ suspend fun main(vararg args: String) {
 
     scope.coroutineContext[Job]!!.join()
 }
+
+
 
 
 
