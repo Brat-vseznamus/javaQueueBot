@@ -3,7 +3,8 @@ import java.sql.*
 import java.util.*
 
 private const val USER_TABLE_NAME = "users"
-private const val DB_PROPERTIES_PATH = "build/resources/main/db.properties"
+//private const val DB_PROPERTIES_PATH = "build/resources/main/db.properties"
+private const val DB_PROPERTIES_PATH = "QueueBot/src/main/resources/db.properties"
 
 class DB {
     private lateinit var connection: Connection
@@ -31,7 +32,8 @@ class DB {
         CREATE TABLE IF NOT EXISTS ${USER_TABLE_NAME} (
             USERTAG TEXT NOT NULL UNIQUE,
             USERNAME TEXT NOT NULL UNIQUE,
-            CHATID INTEGER NOT NULL
+            CHATID INTEGER NOT NULL,
+            MUTED BOOLEAN NOT NULL
         )
         """.trimIndent())
     }
@@ -49,8 +51,9 @@ class DB {
 
     fun addUser(userTag : String, userName : String, userChatId : Int) {
         val stmt = connection.createStatement()
+        val defaulMuteStatus = false
         if (!containsUser(userTag)) {
-            stmt.execute("INSERT INTO $USER_TABLE_NAME (USERTAG, USERNAME, CHATID) VALUES (\'$userTag\', \'$userName\', $userChatId)")
+            stmt.execute("INSERT INTO $USER_TABLE_NAME (USERTAG, USERNAME, CHATID, MUTED) VALUES (\'$userTag\', \'$userName\', $userChatId, $defaulMuteStatus)")
         } else {
             stmt.executeUpdate("UPDATE $USER_TABLE_NAME SET USERNAME = \'$userName\' WHERE USERTAG = \'$userTag\'")
         }
@@ -92,6 +95,13 @@ class DB {
             list.add(rs.getString("USERNAME"))
         }
         return list
+    }
+
+    fun updateMuteStatus(userTag: String) {
+        val stmt = connection.createStatement()
+        val newMuteStatus = true
+        stmt.executeUpdate("UPDATE $USER_TABLE_NAME SET MUTED = $newMuteStatus WHERE USERTAG = \'$userTag\'")
+        stmt.close()
     }
 
 }

@@ -1,27 +1,7 @@
-import dev.inmo.micro_utils.coroutines.safely
-import dev.inmo.tgbotapi.extensions.api.chat.get.getChat
-import dev.inmo.tgbotapi.extensions.api.send.reply
-import dev.inmo.tgbotapi.extensions.api.send.sendTextMessage
 import dev.inmo.tgbotapi.bot.Ktor.telegramBot
 import dev.inmo.tgbotapi.extensions.api.bot.getMe
-import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContext
 import dev.inmo.tgbotapi.extensions.behaviour_builder.buildBehaviour
-import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onCommand
-import dev.inmo.tgbotapi.extensions.utils.asChannelChat
-import dev.inmo.tgbotapi.extensions.utils.formatting.linkMarkdownV2
-import dev.inmo.tgbotapi.extensions.utils.formatting.textMentionMarkdownV2
-import dev.inmo.tgbotapi.extensions.utils.updates.retrieving.startGettingFlowsUpdatesByLongPolling
-import dev.inmo.tgbotapi.types.BotCommand
-import dev.inmo.tgbotapi.types.ChatIdentifier
-import dev.inmo.tgbotapi.types.ParseMode.Markdown
-import dev.inmo.tgbotapi.types.ParseMode.MarkdownV2
-import dev.inmo.tgbotapi.types.User
-import dev.inmo.tgbotapi.types.chat.abstracts.*
-import dev.inmo.tgbotapi.types.textField
-import dev.inmo.tgbotapi.utils.extensions.escapeMarkdownV2Common
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import java.io.BufferedInputStream
 import java.io.BufferedReader
 import java.io.FileInputStream
@@ -43,7 +23,7 @@ fun sendMessage(chatId : Int, text : String, botToken : String) {
     val response = br.readText()
 }
 
-suspend fun main(vararg args: String) {
+suspend fun main() {
     val botproperties = Properties();
     botproperties.load(FileInputStream("build/resources/main/botInfo.properties"))
     val botToken = botproperties.getProperty("botInfo.token")

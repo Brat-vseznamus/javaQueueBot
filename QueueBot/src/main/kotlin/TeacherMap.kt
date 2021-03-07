@@ -1,5 +1,4 @@
-
-val TEACHERS = arrayListOf<String>(
+val TEACHERS = arrayListOf(
     "Ведерников",
     "Корнеев",
     "Кравцов",
@@ -7,7 +6,7 @@ val TEACHERS = arrayListOf<String>(
     "Юрченко"
 )
 
-val TEACHERS_FULL_NAMES = arrayListOf<String>(
+val TEACHERS_FULL_NAMES = arrayListOf(
     "Ведерников Николай Викторович",
     "Корнеев Георгий Александрович",
     "Кравцов Никита Олегович",

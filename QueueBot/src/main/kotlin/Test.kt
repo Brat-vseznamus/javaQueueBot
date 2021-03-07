@@ -2,9 +2,13 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-suspend fun main(vararg args: String) {
-//    val db = DB()
-//    println("Start")
+suspend fun main() {
+    val db = DB()
+    val users = db.getUsers()
+    for (user in users) {
+        println(user)
+    }
+    println("Start")
 //
 // Start a coroutine
     fun getTb() = SheetsQuickstart.getQueues("1EmM8619VtPPd5svGF-vuXNVDf6vImsucU3GTXwUi9NE", "Лист1", "A1:D6")
