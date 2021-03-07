@@ -43,6 +43,7 @@ suspend fun main(vararg args: String) {
         startCommand()
         queueCommand()
         findMeCommand()
+        setNameCommand()
     }
 
 

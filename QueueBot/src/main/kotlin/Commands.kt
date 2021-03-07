@@ -45,8 +45,7 @@ val tmpUserMap = mutableMapOf<String, String>(
     "@Quicksmart" to "Будущев Матвей Ярославович")
 
 fun getName(usertag : String) : String? {
-
-    return tmpUserMap[usertag]
+    return db.getUserName(usertag)
 }
 
 public suspend inline fun BehaviourContext.findMeCommand() : Job =
@@ -65,5 +64,30 @@ public suspend inline fun BehaviourContext.findMeCommand() : Job =
             if (tb != null) {
                 sendTextMessage(it.chat, tb.find(name), Markdown)
             }
+        }
+    }
+
+fun setName(usertag : String, username : String) {
+    db.addUser(usertag, username)
+}
+
+public suspend inline fun BehaviourContext.setNameCommand() : Job =
+    onCommand("setname", false) {
+        val messageText = it.content.text
+        val addInfo = messageText.substringAfter("/setname ")
+        val dm = Table.DMTable()
+        val chat = it.chat
+        val usertag = when (chat) {
+            is PrivateChat ->
+                chat.username?.username
+            else -> ""
+        }
+        if (dm.checkExisting(addInfo)) {
+            if (usertag != null) {
+                setName(usertag, addInfo)
+            }
+            sendTextMessage(it.chat, "Your name changed successfully to $addInfo!", Markdown)
+        } else {
+            sendTextMessage(it.chat, "Unknown student: $addInfo", Markdown)
         }
     }

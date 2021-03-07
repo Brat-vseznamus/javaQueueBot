@@ -17,15 +17,18 @@ import com.google.api.client.json.JsonFactory
 import com.google.api.services.sheets.v4.Sheets
 import java.io.File
 import java.io.InputStreamReader
-import java.util.*
 
 object SheetsQuickstart {
     private const val APPLICATION_NAME = "Google Sheets API Java Quickstart"
     private val JSON_FACTORY: JsonFactory = JacksonFactory.getDefaultInstance()
     private const val TOKENS_DIRECTORY_PATH = "tokens"
-    private const val SPREAD_SHEETS_ID = "1f2tmAL9QWZ2mf4x0VExjrJ0GwxfhJv6mnepjOQgEsTI"
-    private const val LIST_NAME = "queue"
-    private const val RANGE = "A1:E20"
+    const val JAVA_SPREAD_SHEETS_ID = "1f2tmAL9QWZ2mf4x0VExjrJ0GwxfhJv6mnepjOQgEsTI"
+    const val JAVA_LIST_NAME = "queue"
+    const val JAVA_RANGE = "A1:E20"
+
+    const val DM_SPREAD_SHEETS_ID = "1LqrnjZB_QiUzyaCrl78Vn8S7-ouE0IKasBgY2tEfxL8"
+    const val DM_LIST_NAME = "Результаты"
+    const val DM_RANGE = "A4:A153"
 
     /**
      * Global instance of the scopes required by this quickstart.
@@ -77,26 +80,23 @@ object SheetsQuickstart {
     @Throws(IOException::class, GeneralSecurityException::class)
     @JvmStatic
     fun getQueues() : MutableList<MutableList<Any>>? {
+        return getQueues(JAVA_SPREAD_SHEETS_ID, JAVA_LIST_NAME, JAVA_RANGE)
+    }
+
+    @Throws(IOException::class, GeneralSecurityException::class)
+    @JvmStatic
+    fun getQueues(spreadsheetid : String, listName : String, range: String) : MutableList<MutableList<Any>>? {
         val HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport()
-        val range = "$LIST_NAME!$RANGE"
+        val range = "$listName!$range"
         val service = Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
             .setApplicationName(APPLICATION_NAME)
             .build()
-        val response = service.spreadsheets().values()[SPREAD_SHEETS_ID, range]
+        val response = service.spreadsheets().values()[spreadsheetid, range]
             .execute()
         val values = response.getValues()
         if (values == null || values.isEmpty()) {
             println("No data found.")
         }
-//        for (row in values) {
-//            for (cell in row) {
-//                print(cell.javaClass)
-//                print(cell.toString())
-//                println(cell.hashCode())
-//            }
-//        }
-//        println(values)
-//        println(Table(values).toString())
         return values;
     }
 

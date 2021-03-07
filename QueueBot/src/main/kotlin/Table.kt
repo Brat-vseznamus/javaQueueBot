@@ -24,6 +24,21 @@ class Table(data : MutableList<MutableList<Any>> ) {
             }
         }
     }
+
+    companion object {
+        fun DMTable() : Table {
+            val data = SheetsQuickstart.getQueues(
+                SheetsQuickstart.DM_SPREAD_SHEETS_ID,
+                SheetsQuickstart.DM_LIST_NAME,
+                SheetsQuickstart.DM_RANGE
+            )
+            if (data != null) {
+                data[0].add(0, "Имена")
+            }
+            return Table(data!!)
+        }
+    }
+
     override fun toString() : String {
         var str = ""
         for ((key, value) in queues) {
@@ -51,6 +66,16 @@ class Table(data : MutableList<MutableList<Any>> ) {
         return str
     }
 
+    fun checkExisting(user: String) : Boolean {
+        for (queue in queues) {
+            val index = queue.value.indexOf(user)
+            if (index != -1) {
+                return true
+            }
+        }
+        return false
+    }
+
     fun find(user : String) : String {
         var str = ""
         for (queue in queues) {
@@ -69,6 +94,9 @@ class Table(data : MutableList<MutableList<Any>> ) {
         }
         if (str.isEmpty()) {
             str += "You're not found in any queue"
+//            if (user.isNotEmpty()) {
+//                str += " ($user)"
+//            }
         }
         return str
     }

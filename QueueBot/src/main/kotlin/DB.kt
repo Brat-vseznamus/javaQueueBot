@@ -3,7 +3,7 @@ import java.sql.*
 import java.util.*
 
 private const val USER_TABLE_NAME = "users"
-private const val DB_PROPERTIES_PATH = "QueueBot/build/resources/main/db.properties"
+private const val DB_PROPERTIES_PATH = "build/resources/main/db.properties"
 
 class DB {
     private lateinit var connection: Connection
@@ -52,6 +52,15 @@ class DB {
         stmt.close()
     }
 
+    fun getUserName(userTag: String) : String? {
+        val stmt = connection.createStatement()
+        val rs : ResultSet = stmt.executeQuery("SELECT * FROM $USER_TABLE_NAME WHERE USERTAG = \'$userTag\'")
+        if (rs.next()) {
+            return rs.getString("USERNAME")
+        }
+        return null
+    }
+
     fun getUsers() : MutableList<String> {
         val stmt = connection.createStatement()
         val rs : ResultSet = stmt.executeQuery("SELECT * FROM $USER_TABLE_NAME")
@@ -61,13 +70,5 @@ class DB {
         }
         return list
     }
-
-//    val tmpUserMap = mutableMapOf<String, String>(
-//        "@Quicksmart" to "Будущев Матвей Ярославович")
-//
-//    fun getName(usertag : String) : String? {
-//        //TODO
-//        return tmpUserMap[usertag]
-//    }
 
 }
