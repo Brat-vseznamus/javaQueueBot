@@ -27,14 +27,15 @@ import java.util.*
 /**
  * The main purpose of this bot is just to answer "Oh, hi, " and add user mention here
  */
+
+internal val db : DB = DB()
+
 suspend fun main(vararg args: String) {
     val botproperties = Properties();
     botproperties.load(FileInputStream("build/resources/main/botInfo.properties"))
     val botToken = botproperties.getProperty("botInfo.token")
     val bot = telegramBot(botToken)
     println(bot.getMe())
-
-//    val db = DB()
     val scope = CoroutineScope(Dispatchers.Default)
 
     bot.buildBehaviour(scope) {

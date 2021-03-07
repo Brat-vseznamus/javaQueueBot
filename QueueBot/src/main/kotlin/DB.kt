@@ -29,35 +29,35 @@ class DB {
         val stmt = connection.createStatement()
         stmt.execute("""
         CREATE TABLE IF NOT EXISTS ${USER_TABLE_NAME} (
-            usertag TEXT NOT NULL UNIQUE,
-            userfullname TEXT NOT NULL UNIQUE
+            USERTAG TEXT NOT NULL UNIQUE,
+            USERNAME TEXT NOT NULL UNIQUE
         )
         """.trimIndent())
     }
 
 
-    fun containsUser(userTag : String) : Boolean {
+    private fun containsUser(userTag : String) : Boolean {
         val stmt = connection.createStatement()
-        val rs : ResultSet = stmt.executeQuery("SELECT * FROM $USER_TABLE_NAME WHERE usertag = $userTag")
+        val rs : ResultSet = stmt.executeQuery("SELECT * FROM $USER_TABLE_NAME WHERE USERTAG = \'$userTag\'")
         return rs.next()
     }
 
     fun addUser(userTag : String, userName : String) {
         val stmt = connection.createStatement()
         if (!containsUser(userTag)) {
-            stmt.execute("INSERT INTO $USER_TABLE_NAME (usertag, userfullname) VALUES ($userTag, $userName)")
+            stmt.execute("INSERT INTO $USER_TABLE_NAME (USERTAG, USERNAME) VALUES (\'$userTag\', \'$userName\')")
         } else {
-            stmt.executeUpdate("UPDATE $USER_TABLE_NAME SET usertag = $userTag WHERE userfullname = $userName")
+            stmt.executeUpdate("UPDATE $USER_TABLE_NAME SET USERNAME = \'$userName\' WHERE USERTAG = \'$userTag\'")
         }
         stmt.close()
     }
 
-    fun getUsers() : MutableList<Int> {
+    fun getUsers() : MutableList<String> {
         val stmt = connection.createStatement()
         val rs : ResultSet = stmt.executeQuery("SELECT * FROM $USER_TABLE_NAME")
-        var list = mutableListOf<Int>()
+        var list = mutableListOf<String>()
         while (rs.next()) {
-            list.add(rs.getInt("user"))
+            list.add(rs.getString("USERNAME"))
         }
         return list
     }

@@ -1,5 +1,5 @@
 suspend fun main(vararg args: String) {
     val db = DB()
-//    db.addUser("a", "b")
+    db.addUser("@Quicksmart", "Вихнин Фёдор Алексеевич")
     println(db.getUsers().toString())
 }

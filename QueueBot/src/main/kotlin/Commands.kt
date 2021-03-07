@@ -45,11 +45,9 @@ val tmpUserMap = mutableMapOf<String, String>(
     "@Quicksmart" to "Будущев Матвей Ярославович")
 
 fun getName(usertag : String) : String? {
-    //TODO
+
     return tmpUserMap[usertag]
 }
-
-
 
 public suspend inline fun BehaviourContext.findMeCommand() : Job =
     onCommand("findme") {
