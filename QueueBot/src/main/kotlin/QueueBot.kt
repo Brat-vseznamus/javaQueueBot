@@ -36,16 +36,16 @@ suspend fun main(vararg args: String) {
     val botToken = botproperties.getProperty("botInfo.token")
     val bot = telegramBot(botToken)
     println(bot.getMe())
+    println(db.getUsers())
     val scope = CoroutineScope(Dispatchers.Default)
 
     bot.buildBehaviour(scope) {
-        println(getMe())
+//        println(getMe())
         startCommand()
         queueCommand()
         findMeCommand()
         setNameCommand()
     }
-
 
 //    bot.startGettingFlowsUpdatesByLongPolling(scope = scope) {
 //        messageFlow.onEach {

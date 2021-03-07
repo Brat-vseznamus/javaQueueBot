@@ -3,8 +3,22 @@ import dev.inmo.tgbotapi.extensions.api.send.sendTextMessage
 import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContext
 import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onCommand
 import dev.inmo.tgbotapi.types.ParseMode.Markdown
+import dev.inmo.tgbotapi.types.chat.abstracts.Chat
 import dev.inmo.tgbotapi.types.chat.abstracts.PrivateChat
 import kotlinx.coroutines.Job
+
+fun getTagName(chat : Chat) : String {
+    val name = when (chat) {
+        is PrivateChat ->
+            chat.firstName + " " + chat.lastName
+        else -> "who?"
+    }
+    return name
+}
+
+fun log(str : String, chat : Chat) {
+    println("${getTagName(chat)}: $str")
+}
 
 public suspend inline fun BehaviourContext.startCommand() : Job =
     onCommand("start") {
@@ -24,9 +38,8 @@ public suspend inline fun BehaviourContext.queueCommand() : Job =
         val addInfo = messageText.substringAfter("/queue")
             .filter { !it.isWhitespace() }
         val index = getTeacher(addInfo)
-        println("!!!")
-        val data = SheetsQuickstart.getQueues()
-        val tb = data?.let { it1 -> Table(it1) }
+        log("check queue", it.chat)
+        val tb = Table.JAVATable()
         if (tb != null) {
             var text = ""
             if (index == -1) {
@@ -41,8 +54,8 @@ public suspend inline fun BehaviourContext.queueCommand() : Job =
         }
     }
 
-val tmpUserMap = mutableMapOf<String, String>(
-    "@Quicksmart" to "Будущев Матвей Ярославович")
+//val tmpUserMap = mutableMapOf<String, String>(
+//    "@Quicksmart" to "Будущев Матвей Ярославович")
 
 fun getName(usertag : String) : String? {
     return db.getUserName(usertag)
@@ -56,11 +69,12 @@ public suspend inline fun BehaviourContext.findMeCommand() : Job =
                 chat.username?.username
             else -> ""
         }
+        log("search himself in queue", it.chat)
         if (usertag != null) {
             var name = getName(usertag)
             if (name == null)
                 name = ""
-            val tb = SheetsQuickstart.getQueues()?.let { it1 -> Table(it1) }
+            val tb = Table.JAVATable()
             if (tb != null) {
                 sendTextMessage(it.chat, tb.find(name), Markdown)
             }
@@ -82,6 +96,7 @@ public suspend inline fun BehaviourContext.setNameCommand() : Job =
                 chat.username?.username
             else -> ""
         }
+        log("try to set name to $addInfo", it.chat)
         if (dm.checkExisting(addInfo)) {
             if (usertag != null) {
                 setName(usertag, addInfo)

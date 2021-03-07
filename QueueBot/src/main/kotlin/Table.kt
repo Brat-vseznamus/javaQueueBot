@@ -1,15 +1,15 @@
 import dev.inmo.tgbotapi.utils.extensions.escapeMarkdownV2Common
 
-class Table(data : MutableList<MutableList<Any>> ) {
+class Table(data : MutableList<MutableList<Any>>, shift1: Int = 0, shift2: Int = 1) {
     private val queues : MutableMap<String, MutableList<String>> = mutableMapOf()
     private val teachers : MutableList<String> = mutableListOf()
 
     init {
-        for (teacher in data[1]) {
+        for (teacher in data[shift1]) { // 1 и 4
             queues.put(teacher as String, mutableListOf())
             teachers.add(teacher)
         }
-        for (rowIndex in 4 until data.size) {
+        for (rowIndex in shift2 until data.size) {
             val row = data[rowIndex]
             for (teacherColumn in 0 until teachers.size) {
                 if (teacherColumn < row.size) {
@@ -37,6 +37,36 @@ class Table(data : MutableList<MutableList<Any>> ) {
             }
             return Table(data!!)
         }
+
+        fun JAVATable() : Table? {
+            val data = SheetsQuickstart.getQueues(
+                SheetsQuickstart.JAVA_SPREAD_SHEETS_ID,
+                SheetsQuickstart.JAVA_LIST_NAME,
+                SheetsQuickstart.JAVA_RANGE
+            ) ?: return null
+            return Table(data, 1, 4)
+        }
+
+        fun compare(tb1 : Table, tb2 : Table) : Int {
+            var changedQueue = 0
+            if (tb1.teachers.size != tb2.teachers.size)
+                return -1
+            for (teacher in tb1.teachers) {
+                if (tb1.queues[teacher]!!.size != tb2.queues[teacher]!!.size) {
+                    return changedQueue
+                }
+                for (studentInd in 0 until tb1.queues[teacher]!!.size) {
+                    val st1 = tb1.queues[teacher]!![studentInd]
+                    val st2 = tb2.queues[teacher]!![studentInd]
+                    if (st1 != st2) {
+                        return changedQueue
+                    }
+                }
+                changedQueue++
+            }
+            return -1
+        }
+
     }
 
     override fun toString() : String {
@@ -95,9 +125,6 @@ class Table(data : MutableList<MutableList<Any>> ) {
         }
         if (str.isEmpty()) {
             str += "You're not found in any queue"
-//            if (user.isNotEmpty()) {
-//                str += " ($user)"
-//            }
         }
         return str
     }
