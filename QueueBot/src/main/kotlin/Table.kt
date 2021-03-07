@@ -96,6 +96,10 @@ class Table(data : MutableList<MutableList<Any>>, shift1: Int = 0, shift2: Int =
         return str
     }
 
+    fun getQueue(index : Int) : List<String>? {
+        return queues[teachers[index]]?.toList()
+    }
+
     fun checkExisting(user: String) : Boolean {
         for (queue in queues) {
             val index = queue.value.indexOf(user)

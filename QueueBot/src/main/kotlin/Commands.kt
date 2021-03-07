@@ -81,8 +81,8 @@ public suspend inline fun BehaviourContext.findMeCommand() : Job =
         }
     }
 
-fun setName(usertag : String, username : String) {
-    db.addUser(usertag, username)
+fun setName(usertag : String, username : String, userChatId : Int) {
+    db.addUser(usertag, username, userChatId)
 }
 
 public suspend inline fun BehaviourContext.setNameCommand() : Job =
@@ -99,7 +99,11 @@ public suspend inline fun BehaviourContext.setNameCommand() : Job =
         log("try to set name to $addInfo", it.chat)
         if (dm.checkExisting(addInfo)) {
             if (usertag != null) {
-                setName(usertag, addInfo)
+                val chatId = when(chat) {
+                    is PrivateChat -> chat.id.chatId.toLong()
+                    else -> 0
+                }
+                setName(usertag, addInfo, chatId.toInt())
             }
             sendTextMessage(it.chat, "Your name changed successfully to $addInfo!", Markdown)
         } else {

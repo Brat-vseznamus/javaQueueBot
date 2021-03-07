@@ -43,6 +43,12 @@ class DB {
         return rs.next()
     }
 
+    fun containsUserName(userName: String) : Boolean {
+        val stmt = connection.createStatement()
+        val rs : ResultSet = stmt.executeQuery("SELECT * FROM $USER_TABLE_NAME WHERE USERNAME = \'$userName\'")
+        return rs.next()
+    }
+
     fun addUser(userTag : String, userName : String) {
         addUser(userTag, userName, 0)
     }
@@ -62,6 +68,15 @@ class DB {
         val rs : ResultSet = stmt.executeQuery("SELECT * FROM $USER_TABLE_NAME WHERE USERTAG = \'$userTag\'")
         if (rs.next()) {
             return rs.getString("USERNAME")
+        }
+        return null
+    }
+
+    fun getUserTag(userName: String) : String? {
+        val stmt = connection.createStatement()
+        val rs : ResultSet = stmt.executeQuery("SELECT * FROM $USER_TABLE_NAME WHERE USERNAME = \'$userName\'")
+        if (rs.next()) {
+            return rs.getString("USERTAG")
         }
         return null
     }

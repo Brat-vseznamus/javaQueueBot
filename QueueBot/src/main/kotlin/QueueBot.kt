@@ -69,11 +69,22 @@ suspend fun main(vararg args: String) {
             if (table != null && newtb != null) {
                 val ind = Table.compare(table!!, newtb)
                 if (ind != -1) {
-                    sendMessage(792139427, "Change ${ind}th queue", botToken)
-                    table = newtb
+                    val queue = newtb.getQueue(ind)
+                    if (queue != null && queue.isNotEmpty()) {
+                        if (queue[0] != table!!.getQueue(ind)!![0]) {
+                            val newHeadName = queue[0]
+                            if (db.containsUserName(newHeadName)) {
+
+                                sendMessage(db.getChatIdByName(newHeadName),
+                                        "${db.getUserTag(newHeadName)},%0A" +
+                                                "You're next to ${getTeacherName(ind)}",
+                                            botToken)
+                            }
+                            table = newtb
+                        }
+                    }
                 }
             }
-
         }
     }
     scope.coroutineContext[Job]!!.join()
