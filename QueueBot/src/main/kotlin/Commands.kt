@@ -10,7 +10,7 @@ import kotlinx.coroutines.Job
 fun getTagName(chat : Chat) : String {
     val name = when (chat) {
         is PrivateChat ->
-            chat.firstName + " " + chat.lastName
+            chat.firstName + " " + chat.lastName +"(${chat.id.chatId})"
         else -> "who?"
     }
     return name

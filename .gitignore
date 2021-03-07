@@ -3,3 +3,4 @@ build/
 .gradle/
 .DS_STORE
 QueueBot/src/main/resources/botInfo.properties
+QueueBot/src/main/resources/credentials.json

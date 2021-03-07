@@ -30,7 +30,8 @@ class DB {
         stmt.execute("""
         CREATE TABLE IF NOT EXISTS ${USER_TABLE_NAME} (
             USERTAG TEXT NOT NULL UNIQUE,
-            USERNAME TEXT NOT NULL UNIQUE
+            USERNAME TEXT NOT NULL UNIQUE,
+            CHATID INTEGER NOT NULL
         )
         """.trimIndent())
     }
@@ -43,9 +44,13 @@ class DB {
     }
 
     fun addUser(userTag : String, userName : String) {
+        addUser(userTag, userName, 0)
+    }
+
+    fun addUser(userTag : String, userName : String, userChatId : Int) {
         val stmt = connection.createStatement()
         if (!containsUser(userTag)) {
-            stmt.execute("INSERT INTO $USER_TABLE_NAME (USERTAG, USERNAME) VALUES (\'$userTag\', \'$userName\')")
+            stmt.execute("INSERT INTO $USER_TABLE_NAME (USERTAG, USERNAME, CHATID) VALUES (\'$userTag\', \'$userName\', $userChatId)")
         } else {
             stmt.executeUpdate("UPDATE $USER_TABLE_NAME SET USERNAME = \'$userName\' WHERE USERTAG = \'$userTag\'")
         }
@@ -59,6 +64,24 @@ class DB {
             return rs.getString("USERNAME")
         }
         return null
+    }
+
+    fun getChatIdByTag(userTag: String) : Int {
+        val stmt = connection.createStatement()
+        val rs : ResultSet = stmt.executeQuery("SELECT * FROM $USER_TABLE_NAME WHERE USERTAG = \'$userTag\'")
+        if (rs.next()) {
+            return rs.getInt("CHATID")
+        }
+        return -1
+    }
+
+    fun getChatIdByName(userName: String) : Int {
+        val stmt = connection.createStatement()
+        val rs : ResultSet = stmt.executeQuery("SELECT * FROM $USER_TABLE_NAME WHERE USERNAME = \'$userName\'")
+        if (rs.next()) {
+            return rs.getInt("CHATID")
+        }
+        return -1
     }
 
     fun getUsers() : MutableList<String> {
