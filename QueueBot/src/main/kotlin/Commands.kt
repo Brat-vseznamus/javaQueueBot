@@ -85,10 +85,17 @@ fun setName(usertag : String, username : String, userChatId : Int) {
     db.addUser(usertag, username, userChatId)
 }
 
+
 public suspend inline fun BehaviourContext.setNameCommand() : Job =
     onCommand("setname", false) {
         val messageText = it.content.text
-        val addInfo = messageText.substringAfter("/setname ")
+        var addInfo = messageText.substringAfter("/setname")
+        if (addInfo.isNotEmpty()) {
+            addInfo = addInfo.substringAfter(' ')
+        } else {
+            sendTextMessage(it.chat, "Type something after command", Markdown)
+            return@onCommand
+        }
         val dm = Table.DMTable()
         val chat = it.chat
         val usertag = when (chat) {

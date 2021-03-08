@@ -43,6 +43,15 @@ fun sendMessage(chatId : Int, text : String, botToken : String) {
     val response = br.readText()
 }
 
+//fun sendRequestToStart(chatId : Int, text : String, botToken : String) {
+//    var urlString = "https://api.telegram.org/bot%s/start"
+//    urlString = String.format(urlString, botToken)
+//    val conn = URL(urlString).openConnection()
+//    val inputStream = BufferedInputStream(conn.getInputStream())
+//    val br = BufferedReader(InputStreamReader(inputStream))
+//    val response = br.readText()
+//}
+
 suspend fun main(vararg args: String) {
     val botproperties = Properties();
     botproperties.load(FileInputStream("build/resources/main/botInfo.properties"))
@@ -62,6 +71,7 @@ suspend fun main(vararg args: String) {
         setNameCommand()
     }
 
+
     GlobalScope.launch {
         while (true) {
             delay(2000L)
@@ -74,7 +84,6 @@ suspend fun main(vararg args: String) {
                         if (queue[0] != table!!.getQueue(ind)!![0]) {
                             val newHeadName = queue[0]
                             if (db.containsUserName(newHeadName)) {
-
                                 sendMessage(db.getChatIdByName(newHeadName),
                                         "${db.getUserTag(newHeadName)},%0A" +
                                                 "You're next to ${getTeacherName(ind)}",
