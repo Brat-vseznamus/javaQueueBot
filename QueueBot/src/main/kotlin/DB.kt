@@ -31,7 +31,8 @@ class DB {
         CREATE TABLE IF NOT EXISTS ${USER_TABLE_NAME} (
             USERTAG TEXT NOT NULL UNIQUE,
             USERNAME TEXT NOT NULL UNIQUE,
-            CHATID INTEGER NOT NULL
+            CHATID INTEGER NOT NULL,
+            MUTE INTEGER NOT NULL DEFAULT 0
         )
         """.trimIndent())
     }
@@ -109,4 +110,70 @@ class DB {
         return list
     }
 
+    fun getUserByProperty(propertyName : String, propertyValue : Any) : User? {
+        val stmt = connection.createStatement()
+        var request = "SELECT * FROM $USER_TABLE_NAME WHERE %s = %s"
+        val value = when (propertyValue) {
+            is String -> "\'$propertyValue\'"
+            is Int -> "$propertyValue"
+            else -> ""
+        }
+        request = String.format(request, propertyName, value)
+        val rs : ResultSet = stmt.executeQuery(request)
+        if (rs.next()) {
+            return User(
+                rs.getString("USERTAG"),
+                rs.getString("USERNAME"),
+                rs.getInt("CHATID"),
+                rs.getInt("MUTE")
+            )
+        } else {
+            return null
+        }
+    }
+
+    fun updateMuteStatus(userTag: String, muteStatus : Boolean) : Boolean{
+        val stmt = connection.createStatement()
+        val newMuteStatus = if (muteStatus) 1 else 0
+        var status = false
+        if (containsUser(userTag)) {
+            stmt.executeUpdate("UPDATE $USER_TABLE_NAME SET MUTE = $newMuteStatus WHERE USERTAG = \'$userTag\'")
+            status = true
+        }
+        stmt.close()
+        return status
+    }
+
+//    fun updateUserByProperty(propertyName : String, propertyValue : Any) : User? {
+//        val stmt = connection.createStatement()
+//        var request = "SELECT * FROM $USER_TABLE_NAME WHERE %s = %s"
+//        val value = when (propertyValue) {
+//            is String -> "\'$propertyValue\'"
+//            is Int -> "$propertyValue"
+//            else -> ""
+//        }
+//        request = String.format(request, propertyName, value)
+//        val rs : ResultSet = stmt.executeQuery(request)
+//        if (rs.next()) {
+//            return User(
+//                rs.getString("USERTAG"),
+//                rs.getString("USERNAME"),
+//                rs.getInt("CHATID"),
+//                rs.getInt("MUTE")
+//            )
+//        } else {
+//            return null
+//        }
+//    }
+
+    fun getUserByName(userName : String) : User? {
+        return getUserByProperty("USERNAME", userName)
+    }
+
 }
+
+data class User(
+    val tag : String,
+    val name : String,
+    val chatId : Int,
+    val mute : Int)

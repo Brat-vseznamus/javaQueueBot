@@ -69,6 +69,8 @@ suspend fun main(vararg args: String) {
         queueCommand()
         findMeCommand()
         setNameCommand()
+        muteCommand()
+        helpCommand()
     }
 
 

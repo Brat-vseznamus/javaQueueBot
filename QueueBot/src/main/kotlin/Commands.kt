@@ -1,4 +1,5 @@
 import dev.inmo.tgbotapi.extensions.api.send.reply
+import dev.inmo.tgbotapi.extensions.api.send.sendMessage
 import dev.inmo.tgbotapi.extensions.api.send.sendTextMessage
 import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContext
 import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onCommand
@@ -20,7 +21,7 @@ fun log(str : String, chat : Chat) {
     println("${getTagName(chat)}: $str")
 }
 
-public suspend inline fun BehaviourContext.startCommand() : Job =
+suspend inline fun BehaviourContext.startCommand() : Job =
     onCommand("start") {
         val chat = it.chat
         val name = when (chat) {
@@ -32,7 +33,7 @@ public suspend inline fun BehaviourContext.startCommand() : Job =
     }
 
 
-public suspend inline fun BehaviourContext.queueCommand() : Job =
+suspend inline fun BehaviourContext.queueCommand() : Job =
     onCommand("queue", false) {
         val messageText = it.content.text
         val addInfo = messageText.substringAfter("/queue")
@@ -54,14 +55,11 @@ public suspend inline fun BehaviourContext.queueCommand() : Job =
         }
     }
 
-//val tmpUserMap = mutableMapOf<String, String>(
-//    "@Quicksmart" to "Будущев Матвей Ярославович")
-
 fun getName(usertag : String) : String? {
     return db.getUserName(usertag)
 }
 
-public suspend inline fun BehaviourContext.findMeCommand() : Job =
+suspend inline fun BehaviourContext.findMeCommand() : Job =
     onCommand("findme") {
         val chat = it.chat
         val usertag = when (chat) {
@@ -86,7 +84,7 @@ fun setName(usertag : String, username : String, userChatId : Int) {
 }
 
 
-public suspend inline fun BehaviourContext.setNameCommand() : Job =
+suspend inline fun BehaviourContext.setNameCommand() : Job =
     onCommand("setname", false) {
         val messageText = it.content.text
         var addInfo = messageText.substringAfter("/setname")
@@ -116,4 +114,49 @@ public suspend inline fun BehaviourContext.setNameCommand() : Job =
         } else {
             sendTextMessage(it.chat, "Unknown student: $addInfo", Markdown)
         }
+    }
+
+fun updateMuteStatus(usertag: String, mutestatus : Boolean) {
+    db.updateMuteStatus(usertag, mutestatus)
+}
+
+suspend inline fun BehaviourContext.muteCommand(): Job =
+    onCommand("mute", false) {
+        val strAfter = it.content.text.substringAfter("/mute")
+        var mutestatus = true
+        if (strAfter.isNotEmpty()) {
+            val intValue = strAfter.filter { !it.isWhitespace() }
+                                    .toIntOrNull()
+            if (intValue != null && intValue == 0) {
+                mutestatus = false
+            }
+        }
+        val chat = it.chat
+        val usertag = when (chat) {
+            is PrivateChat ->
+                chat.username?.username
+            else -> ""
+        }
+        sendTextMessage(
+            it.chat,
+            "Now notifications are *${if (mutestatus) "" else "un"}muted*",
+            Markdown)
+        updateMuteStatus(usertag!!, mutestatus)
+    }
+
+suspend inline fun BehaviourContext.helpCommand() : Job =
+    onCommand("help") {
+        val ch = '+'
+        val text =
+            "*queue* - показать все очереди\n" +
+            "$ch ``queue`` - все очереди\n" +
+            "$ch ``queue <фамилия преподавателя>`` - конкретная очередь\n\n" +
+            "*findme* - найти себя в очереди\n\n" +
+            "*setname* - установить имя\n" +
+            "$ch ``setname <ФИО>`` - полное ФИО, как в табличке по ДМ\n\n" +
+            "*mute* - включить/отключить оповещения\n" +
+            "$ch ``mute`` - отключить оповещения\n" +
+            "$ch ``mute 1`` - отключить оповещения\n" +
+            "$ch ``mute 0`` - включить оповещения\n"
+        sendTextMessage(it.chat, text, Markdown)
     }
