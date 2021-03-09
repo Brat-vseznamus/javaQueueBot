@@ -6,7 +6,7 @@ class Table(data : MutableList<MutableList<Any>>, shift1: Int = 0, shift2: Int =
 
     init {
         for (teacher in data[shift1]) { // 1 и 4
-            queues.put(teacher as String, mutableListOf())
+            queues[teacher as String] = mutableListOf()
             teachers.add(teacher)
         }
         for (rowIndex in shift2 until data.size) {

@@ -39,7 +39,7 @@ suspend inline fun BehaviourContext.queueCommand() : Job =
         val addInfo = messageText.substringAfter("/queue")
             .filter { !it.isWhitespace() }
         val index = getTeacher(addInfo)
-        log("check queue", it.chat)
+        log("check queue $addInfo", it.chat)
         val tb = Table.JAVATable()
         if (tb != null) {
             var text = ""
@@ -137,6 +137,7 @@ suspend inline fun BehaviourContext.muteCommand(): Job =
                 chat.username?.username
             else -> ""
         }
+        log("try to ${if (mutestatus) "" else "un"}mute", it.chat)
         sendTextMessage(
             it.chat,
             "Now notifications are *${if (mutestatus) "" else "un"}muted*",
@@ -147,6 +148,7 @@ suspend inline fun BehaviourContext.muteCommand(): Job =
 suspend inline fun BehaviourContext.helpCommand() : Job =
     onCommand("help") {
         val ch = '+'
+        log("need to help", it.chat)
         val text =
             "*queue* - показать все очереди\n" +
             "$ch ``queue`` - все очереди\n" +
