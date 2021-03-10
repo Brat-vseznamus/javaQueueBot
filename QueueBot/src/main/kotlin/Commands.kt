@@ -145,6 +145,46 @@ suspend inline fun BehaviourContext.muteCommand(): Job =
         updateMuteStatus(usertag!!, mutestatus)
     }
 
+fun setTime(usertag : String, time : Int) {
+    db.addTime(usertag, time)
+}
+
+suspend inline fun BehaviourContext.setNotificationCommand(): Job =
+    onCommand("setnotification", false) {
+        val strAfter = it.content.text.substringAfter("/setnotification")
+        var position = 0
+        if (strAfter.isNotEmpty()) {
+            val intValue = strAfter.filter { !it.isWhitespace() }
+                .toIntOrNull()
+            if (intValue != null && intValue >= 1) {
+                position = intValue
+            } else {
+                sendTextMessage(
+                    it.chat,
+                    "Wrong input: \"$strAfter\"",
+                    Markdown)
+                return@onCommand
+            }
+        } else {
+            sendTextMessage(
+                it.chat,
+                "Wrong input: \"$strAfter\"",
+                Markdown)
+            return@onCommand
+        }
+        sendTextMessage(
+            it.chat,
+            "Notification set on ${getNumeral(position)} position",
+            Markdown)
+        val chat = it.chat
+        val usertag = when (chat) {
+            is PrivateChat ->
+                chat.username?.username
+            else -> ""
+        }
+        setTime(usertag!!, position)
+    }
+
 suspend inline fun BehaviourContext.helpCommand() : Job =
     onCommand("help") {
         val ch = '+'
@@ -159,6 +199,8 @@ suspend inline fun BehaviourContext.helpCommand() : Job =
             "*mute* - включить/отключить оповещения\n" +
             "$ch ``mute`` - отключить оповещения\n" +
             "$ch ``mute 1`` - отключить оповещения\n" +
-            "$ch ``mute 0`` - включить оповещения\n"
+            "$ch ``mute 0`` - включить оповещения\n\n" +
+            "*setnotification* - установить уведомление на более раннюю позицию, чем 1\n" +
+            "$ch ``setnotification <число>`` - число >= 2\n"
         sendTextMessage(it.chat, text, Markdown)
     }

@@ -3,6 +3,7 @@ import java.sql.*
 import java.util.*
 
 private const val USER_TABLE_NAME = "users"
+private const val NOTIFICATION_TABLE_NAME = "notifications"
 private const val DB_PROPERTIES_PATH = "build/resources/main/db.properties"
 
 class DB {
@@ -19,6 +20,7 @@ class DB {
         try {
             connection = DriverManager.getConnection("jdbc:sqlite:$path")
             createUserTable(connection)
+            createNotificationTable(connection)
         } catch (e: SQLException) {
             println(e.message)
             e.printStackTrace()
@@ -37,10 +39,66 @@ class DB {
         """.trimIndent())
     }
 
+    private fun createNotificationTable(connection: Connection) {
+        val stmt = connection.createStatement()
+        stmt.execute("""
+        CREATE TABLE IF NOT EXISTS ${NOTIFICATION_TABLE_NAME} (
+            USERTAG TEXT NOT NULL,
+            NTIME INTEGER NOT NULL
+        )
+        """.trimIndent())
+    }
+
+    fun getTimesOf(usertag : String) : List<Int> {
+        val times = mutableListOf<Int>()
+        val stmt = connection.createStatement()
+        val rs : ResultSet = stmt.executeQuery("SELECT * FROM $NOTIFICATION_TABLE_NAME WHERE USERTAG = \'$usertag\'")
+        while (rs.next()) {
+            times.add(rs.getInt("NTIME"))
+        }
+        return times
+    }
+
+    fun addTime(userTag : String, time : Int) {
+        val stmt = connection.createStatement()
+        if (!containsUserAndTime(userTag, NOTIFICATION_TABLE_NAME, time)) {
+            stmt.execute("INSERT INTO $NOTIFICATION_TABLE_NAME (USERTAG, NTIME) VALUES (\'$userTag\', $time)")
+        }
+        stmt.close()
+    }
+
+    fun deleteTime(userTag : String, time : Int) {
+        val stmt = connection.createStatement()
+        if (containsUserAndTime(userTag, NOTIFICATION_TABLE_NAME, time)) {
+            stmt.execute("DELETE FROM $NOTIFICATION_TABLE_NAME WHERE USERTAG = \'$userTag\' AND NTIME = $time")
+        }
+        stmt.close()
+    }
+
+    fun deleteAllTimes(userTag : String) {
+        val stmt = connection.createStatement()
+        if (containsUser(userTag, NOTIFICATION_TABLE_NAME)) {
+            stmt.execute("DELETE FROM $NOTIFICATION_TABLE_NAME WHERE USERTAG = \'$userTag\'")
+        }
+        stmt.close()
+    }
+
 
     private fun containsUser(userTag : String) : Boolean {
         val stmt = connection.createStatement()
         val rs : ResultSet = stmt.executeQuery("SELECT * FROM $USER_TABLE_NAME WHERE USERTAG = \'$userTag\'")
+        return rs.next()
+    }
+
+    private fun containsUser(userTag : String, table : String) : Boolean {
+        val stmt = connection.createStatement()
+        val rs : ResultSet = stmt.executeQuery("SELECT * FROM $table WHERE USERTAG = \'$userTag\'")
+        return rs.next()
+    }
+
+    private fun containsUserAndTime(userTag : String, table : String, time : Int) : Boolean {
+        val stmt = connection.createStatement()
+        val rs : ResultSet = stmt.executeQuery("SELECT * FROM $table WHERE USERTAG = \'$userTag\' AND NTIME = $time")
         return rs.next()
     }
 

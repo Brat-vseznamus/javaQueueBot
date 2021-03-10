@@ -31,8 +31,12 @@ suspend fun main(vararg args: String) {
     println(db.getUsers())
     val scope = CoroutineScope(Dispatchers.Default)
     //var javatb = Table.JAVATable()
-    fun getTb() = SheetsQuickstart.getQueues("1EmM8619VtPPd5svGF-vuXNVDf6vImsucU3GTXwUi9NE", "Лист1", "A1:D6")
-    var table = getTb()?.let { Table(it) }
+//    fun getTb() = SheetsQuickstart.getQueues("1EmM8619VtPPd5svGF-vuXNVDf6vImsucU3GTXwUi9NE", "Лист1", "A1:D6")
+//    var table = getTb()?.let { Table(it) }
+
+    val getTb : () -> Spreadsheet? = {
+        Spreadsheet(SpreadsheetInfo("1EmM8619VtPPd5svGF-vuXNVDf6vImsucU3GTXwUi9NE", "Лист1", "A1:D6"))
+    }
 
     bot.buildBehaviour(scope) {
         startCommand()
@@ -41,33 +45,83 @@ suspend fun main(vararg args: String) {
         setNameCommand()
         muteCommand()
         helpCommand()
+        setNotificationCommand()
     }
 
     GlobalScope.launch {
-        while (true) {
-            delay(2000L)
-            val newtb = getTb()?.let { Table(it) }
-            if (table != null && newtb != null) {
-                val ind = Table.compare(table!!, newtb)
-                if (ind != -1) {
-                    val queue = newtb.getQueue(ind)
-                    if (queue != null && queue.isNotEmpty()) {
-                        if (queue[0] != table!!.getQueue(ind)!![0]) {
-                            val newHeadName = queue[0]
-                            if (db.containsUserName(newHeadName)) {
-                                sendMessage(db.getChatIdByName(newHeadName),
-                                        "${db.getUserTag(newHeadName)},%0A" +
-                                                "You're next to ${getTeacherName(ind)}",
-                                            botToken)
+        tableListing(botToken, { getTb() })
+//        while (true) {
+//            delay(2000L)
+//            val newtb = getTb()?.let { Table(it) }
+//            if (table != null && newtb != null) {
+//                val ind = Table.compare(table!!, newtb)
+//                if (ind != -1) {
+//                    val queue = newtb.getQueue(ind)
+//                    if (queue != null && queue.isNotEmpty()) {
+//                        if (queue[0] != table!!.getQueue(ind)!![0]) {
+//                            val newHeadName = queue[0]
+//                            if (db.containsUserName(newHeadName)) {
+//                                sendMessage(db.getChatIdByName(newHeadName),
+//                                        "${db.getUserTag(newHeadName)},%0A" +
+//                                                "You're next to ${getTeacherName(ind)}",
+//                                            botToken)
+//                            }
+//                            table = newtb
+//                        }
+//                    }
+//                }
+//            }
+//        }
+    }
+    scope.coroutineContext[Job]!!.join()
+}
+
+suspend fun tableListing(botToken: String, updateTable : () -> Spreadsheet?) {
+    var table = updateTable()
+    while (true) {
+        delay(2000L)
+        val newtb = updateTable()
+        if (table != null && newtb != null) {
+            val difference = table.findDifferencesFrom(newtb)
+            if (difference.isNotEmpty()) {
+                for (entry in difference) {
+                    val person = entry.first
+                    val column = entry.second.first
+                    val position = entry.second.second
+                    val user = db.getUserByName(person)
+                    if (user != null && user.mute != 1) {
+                        if (position == 0) {
+                            sendMessage(user.chatId,
+                                "${user.tag},%0A" +
+                                        "You're next to ${table.columnsName[column]}",
+                                botToken)
+                            println("@Bot send message to ${user.tag}")
+                        } else {
+                            val positions = db.getTimesOf(user.tag)
+                            println(positions)
+                            if (positions.isNotEmpty()) {
+                                var send = false
+                                for (pos in positions) {
+                                    if (position + 1 <= pos) {
+                                        send = true
+                                        break
+                                    }
+                                }
+                                if (send) {
+                                    sendMessage(user.chatId,
+                                        "${user.tag},%0A" +
+                                                "You're ${getNumeral(position + 1)} to ${table.columnsName[column]}",
+                                        botToken)
+                                    println("@Bot send message to ${user.tag}")
+                                }
                             }
-                            table = newtb
                         }
                     }
                 }
             }
         }
+        table = newtb
     }
-    scope.coroutineContext[Job]!!.join()
 }
 
 

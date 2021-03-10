@@ -44,8 +44,31 @@ class Spreadsheet {
             list.addAll(remains)
             return list
         }
-    }
 
+        fun DMTable() : Spreadsheet? {
+            val data = SheetsQuickstart.getQueues(
+                SheetsQuickstart.DM_SPREAD_SHEETS_ID,
+                SheetsQuickstart.DM_LIST_NAME,
+                SheetsQuickstart.DM_RANGE
+            )
+            if (data != null) {
+                data[0].add(0, "Имена")
+            } else {
+                return null
+            }
+            return Spreadsheet(data)
+        }
+
+        fun JAVATable() : Spreadsheet? {
+            val data = SheetsQuickstart.getQueues(
+                SheetsQuickstart.JAVA_SPREAD_SHEETS_ID,
+                SheetsQuickstart.JAVA_LIST_NAME,
+                SheetsQuickstart.JAVA_RANGE
+            ) ?: return null
+            return Spreadsheet(data, 1, 4)
+        }
+
+    }
 
     fun getQueue(index : Int) : MutableList<String>? {
         if (index < 0)
@@ -109,6 +132,31 @@ class Spreadsheet {
             column++
         }
         return map
+    }
+
+    fun findPositionOf(element : String, column : Int) : Int {
+        val cnts = getQueue(column)!!.count { it.equals(element) }
+        if (cnts > 1 || cnts == 0) {
+            return -1
+        }
+        return getQueue(column)!!.indexOf(element)
+    }
+
+    fun findDifferencesFrom(table : Spreadsheet) : List<Pair<String, Pair<Int, Int>>> {
+        val result = mutableListOf<Pair<String, Pair<Int, Int>>>()
+        var columnIndex = 0
+        for (queue in getQueues()) {
+            var position = 0
+            for (cell in queue) {
+                val index = table.findPositionOf(cell, columnIndex)
+                if (index != -1 && index < position) {
+                    result.add(Pair(cell, Pair(columnIndex, index)))
+                }
+                position++
+            }
+            columnIndex++
+        }
+        return result
     }
 
 

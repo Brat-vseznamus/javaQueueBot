@@ -1,7 +1,3 @@
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-
 suspend fun main(vararg args: String) {
 //    val db = DB()
 //    println("Start")
@@ -10,8 +6,8 @@ suspend fun main(vararg args: String) {
 
     val tableInfo = SpreadsheetInfo("1EmM8619VtPPd5svGF-vuXNVDf6vImsucU3GTXwUi9NE", "Лист1", "A1:D6")
     val table = Spreadsheet(tableInfo)
-    val enries = table.getMapOfAllEntries()
-    for ((k, v) in enries) {
+    val entries = table.getMapOfAllEntries()
+    for ((k, v) in entries) {
         println("key \"$k\"")
         println(v)
     }
