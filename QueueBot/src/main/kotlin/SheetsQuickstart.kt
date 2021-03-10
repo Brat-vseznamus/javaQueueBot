@@ -70,11 +70,11 @@ object SheetsQuickstart {
     fun main(args: Array<String>) {
         // Build a new authorized API client service.
         val queues = getQueues();
-        if (queues != null) {
-            for (row in queues) {
-                println(row)
-            }
-        }
+//        if (queues != null) {
+//            for (row in queues) {
+//                println(row)
+//            }
+//        }
     }
 
     @Throws(IOException::class, GeneralSecurityException::class)
