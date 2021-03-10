@@ -72,9 +72,8 @@ class Table(data : MutableList<MutableList<Any>>, shift1: Int = 0, shift2: Int =
     override fun toString() : String {
         var str = ""
         for ((key, value) in queues) {
-            str += "$key: "
+            str += key
             str += value
-            str += '\n'
         }
         return str
     }
@@ -94,21 +93,6 @@ class Table(data : MutableList<MutableList<Any>>, shift1: Int = 0, shift2: Int =
             str += " #${index++} _$student\n_"
         str += '\n'
         return str
-    }
-
-    fun getQueue(index : Int) : List<String>? {
-        return queues[teachers[index]]?.toList()
-    }
-
-    fun checkExisting(user: String) : Boolean {
-        for (queue in queues) {
-            val index = queue.value.indexOf(user)
-            if (index != -1) {
-                return true
-            }
-        }
-        // da ya
-        return false
     }
 
     fun find(user : String) : String {
