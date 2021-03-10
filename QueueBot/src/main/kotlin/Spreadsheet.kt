@@ -100,8 +100,10 @@ class Spreadsheet {
         for (queue in getQueues()) {
             var cellIndex = 0
             for (cell in queue) {
-                map.getOrPut(cell) { mutableListOf()}
-                    .add(Pair(column, cellIndex))
+                if (cell.isNotEmpty()) {
+                    map.getOrPut(cell) { mutableListOf() }
+                        .add(Pair(column, cellIndex))
+                }
                 cellIndex++
             }
             column++

@@ -7,10 +7,14 @@ suspend fun main(vararg args: String) {
 //    println("Start")
 //
 
-    val map = mutableMapOf<Int, MutableList<Int>>()
-    val list = map.getOrPut(1) { mutableListOf()}
-    list.add(2)
-    println(map)
+
+    val tableInfo = SpreadsheetInfo("1EmM8619VtPPd5svGF-vuXNVDf6vImsucU3GTXwUi9NE", "Лист1", "A1:D6")
+    val table = Spreadsheet(tableInfo)
+    val enries = table.getMapOfAllEntries()
+    for ((k, v) in enries) {
+        println("key \"$k\"")
+        println(v)
+    }
 // Start a coroutine
 //    fun getTb() = SheetsQuickstart.getQueues("1EmM8619VtPPd5svGF-vuXNVDf6vImsucU3GTXwUi9NE", "Лист1", "A1:D6")
 //    var table = getTb()?.let { Table(it) }
