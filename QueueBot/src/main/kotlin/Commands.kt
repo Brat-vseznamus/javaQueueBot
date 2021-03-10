@@ -177,6 +177,7 @@ suspend inline fun BehaviourContext.setNotificationCommand(): Job =
             "Notification set on ${getNumeral(position)} position",
             Markdown)
         val chat = it.chat
+        log("set additional notification on $position", chat)
         val usertag = when (chat) {
             is PrivateChat ->
                 chat.username?.username
@@ -203,4 +204,16 @@ suspend inline fun BehaviourContext.helpCommand() : Job =
             "*setnotification* - установить уведомление на более раннюю позицию, чем 1\n" +
             "$ch ``setnotification <число>`` - число >= 2\n"
         sendTextMessage(it.chat, text, Markdown)
+    }
+
+fun deleteAll(usertag: String) {
+    db.deleteAllTimes(usertag)
+}
+
+suspend inline fun BehaviourContext.deleteNotificationsCommand() : Job =
+    onCommand("deletenotifications") {
+        val ch = '+'
+        log("delete all additional notifications", it.chat)
+        deleteAll((it.chat as PrivateChat).username?.username!!)
+        sendTextMessage(it.chat, "All notifications was deleted", Markdown)
     }

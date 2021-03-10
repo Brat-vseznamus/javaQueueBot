@@ -46,32 +46,11 @@ suspend fun main(vararg args: String) {
         muteCommand()
         helpCommand()
         setNotificationCommand()
+        deleteNotificationsCommand()
     }
 
     GlobalScope.launch {
-        tableListing(botToken, { getTb() })
-//        while (true) {
-//            delay(2000L)
-//            val newtb = getTb()?.let { Table(it) }
-//            if (table != null && newtb != null) {
-//                val ind = Table.compare(table!!, newtb)
-//                if (ind != -1) {
-//                    val queue = newtb.getQueue(ind)
-//                    if (queue != null && queue.isNotEmpty()) {
-//                        if (queue[0] != table!!.getQueue(ind)!![0]) {
-//                            val newHeadName = queue[0]
-//                            if (db.containsUserName(newHeadName)) {
-//                                sendMessage(db.getChatIdByName(newHeadName),
-//                                        "${db.getUserTag(newHeadName)},%0A" +
-//                                                "You're next to ${getTeacherName(ind)}",
-//                                            botToken)
-//                            }
-//                            table = newtb
-//                        }
-//                    }
-//                }
-//            }
-//        }
+        tableListing(botToken) { getTb() }
     }
     scope.coroutineContext[Job]!!.join()
 }
@@ -98,7 +77,7 @@ suspend fun tableListing(botToken: String, updateTable : () -> Spreadsheet?) {
                             println("@Bot send message to ${user.tag}")
                         } else {
                             val positions = db.getTimesOf(user.tag)
-                            println(positions)
+//                            println(positions)
                             if (positions.isNotEmpty()) {
                                 var send = false
                                 for (pos in positions) {
