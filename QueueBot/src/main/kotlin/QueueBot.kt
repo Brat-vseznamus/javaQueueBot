@@ -1,12 +1,17 @@
+import dev.inmo.tgbotapi.CommonAbstracts.types.ChatRequest
 import dev.inmo.tgbotapi.bot.Ktor.telegramBot
 import dev.inmo.tgbotapi.extensions.api.bot.getMe
+import dev.inmo.tgbotapi.extensions.api.chat.get.getChat
 import dev.inmo.tgbotapi.extensions.behaviour_builder.buildBehaviour
+import dev.inmo.tgbotapi.requests.abstracts.*
+import dev.inmo.tgbotapi.requests.send.SendTextMessage
+import dev.inmo.tgbotapi.requests.send.media.SendDocument
+import dev.inmo.tgbotapi.requests.send.media.SendDocumentData
+import dev.inmo.tgbotapi.types.ChatId
 import dev.inmo.tgbotapi.utils.PreviewFeature
+import dev.inmo.tgbotapi.utils.StorageFile
 import kotlinx.coroutines.*
-import java.io.BufferedInputStream
-import java.io.BufferedReader
-import java.io.FileInputStream
-import java.io.InputStreamReader
+import java.io.*
 import java.net.URL
 import java.util.*
 
@@ -34,8 +39,14 @@ suspend fun main(vararg args: String) {
 //    fun getTb() = SheetsQuickstart.getQueues("1EmM8619VtPPd5svGF-vuXNVDf6vImsucU3GTXwUi9NE", "Лист1", "A1:D6")
 //    var table = getTb()?.let { Table(it) }
 
+//    bot.execute(SendTextMessage(ChatId(420953808), "suka"))
+//    val file = File("build/resources/main/filename.txt")
+//    db.printTable(File("build/resources/main/filename.txt"))
+//    bot.execute(SendDocument(ChatId(420953808), MultipartFile(StorageFile(file))))
+
+
     val getTb : () -> Spreadsheet? = {
-        Spreadsheet(SpreadsheetInfo("1EmM8619VtPPd5svGF-vuXNVDf6vImsucU3GTXwUi9NE", "Лист1", "A1:D6"))
+        Spreadsheet.JAVATable()
     }
 
     bot.buildBehaviour(scope) {
@@ -47,15 +58,19 @@ suspend fun main(vararg args: String) {
         helpCommand()
         setNotificationCommand()
         deleteNotificationsCommand()
+        linksCommand()
     }
 
     GlobalScope.launch {
         tableListing(botToken) { getTb() }
     }
+    GlobalScope.launch {
+        tableListing(botToken) { Spreadsheet.JAVATable(1) }
+    }
     scope.coroutineContext[Job]!!.join()
 }
 
-suspend fun tableListing(botToken: String, updateTable : () -> Spreadsheet?) {
+suspend fun tableListing(botToken: String, updateTable: () -> Spreadsheet?) {
     var table = updateTable()
     while (true) {
         delay(2000L)

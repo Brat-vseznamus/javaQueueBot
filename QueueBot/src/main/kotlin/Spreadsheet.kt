@@ -59,6 +59,24 @@ class Spreadsheet {
             return Spreadsheet(data)
         }
 
+        fun DMTable(course : Int) : Spreadsheet? {
+            when (course) {
+                2 -> return DMTable()
+                1 -> {
+                    val data = SheetsQuickstart.getQueues(
+                        "1bght8Rl7-rY5G-VSY_3pVfQTa1Lvg07LlgKOnsUSl58",
+                        SheetsQuickstart.DM_LIST_NAME,
+                        "A4:A202"
+                    )
+                    if (data != null) {
+                        data[0].add(0, "Имена")
+                    }
+                    return Spreadsheet(data!!)
+                }
+                else -> return null
+            }
+        }
+
         fun JAVATable() : Spreadsheet? {
             val data = SheetsQuickstart.getQueues(
                 SheetsQuickstart.JAVA_SPREAD_SHEETS_ID,
@@ -68,6 +86,20 @@ class Spreadsheet {
             return Spreadsheet(data, 1, 4)
         }
 
+        fun JAVATable(course : Int) : Spreadsheet? {
+            when (course) {
+                2 -> return JAVATable()
+                1 -> {
+                    val data = SheetsQuickstart.getQueues(
+                        "1qA5bxy6orLWvjUrS88zQz5nGJOs_eq8zMtROmq-HV1U",
+                        SheetsQuickstart.JAVA_LIST_NAME,
+                        "A1:F20"
+                    ) ?: return null
+                    return Spreadsheet(data, 1, 4)
+                }
+                else -> return null
+            }
+        }
     }
 
     fun getQueue(index : Int) : MutableList<String>? {

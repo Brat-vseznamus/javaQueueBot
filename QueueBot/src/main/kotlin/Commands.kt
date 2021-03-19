@@ -12,7 +12,7 @@ fun getTagName(chat : Chat) : String {
     val name = when (chat) {
         is PrivateChat ->
             chat.firstName + " " + chat.lastName +"(${chat.id.chatId})"
-        else -> "who?"
+        else -> "stas"
     }
     return name
 }
@@ -94,15 +94,15 @@ suspend inline fun BehaviourContext.setNameCommand() : Job =
             sendTextMessage(it.chat, "Type something after command", Markdown)
             return@onCommand
         }
-        val dm = Table.DMTable()
         val chat = it.chat
         val usertag = when (chat) {
             is PrivateChat ->
                 chat.username?.username
             else -> ""
         }
+        val dm = Table.DMTable()
         log("try to set name to $addInfo", it.chat)
-        if (dm.checkExisting(addInfo)) {
+        if (dm.checkExisting(addInfo) || Table.DMTable(1)!!.checkExisting(addInfo)) {
             if (usertag != null) {
                 val chatId = when(chat) {
                     is PrivateChat -> chat.id.chatId.toLong()
@@ -188,7 +188,7 @@ suspend inline fun BehaviourContext.setNotificationCommand(): Job =
 
 suspend inline fun BehaviourContext.helpCommand() : Job =
     onCommand("help") {
-        val ch = '+'
+        val ch = "  "
         log("need to help", it.chat)
         val text =
             "*queue* - показать все очереди\n" +
@@ -212,8 +212,20 @@ fun deleteAll(usertag: String) {
 
 suspend inline fun BehaviourContext.deleteNotificationsCommand() : Job =
     onCommand("deletenotifications") {
-        val ch = '+'
         log("delete all additional notifications", it.chat)
         deleteAll((it.chat as PrivateChat).username?.username!!)
         sendTextMessage(it.chat, "All notifications was deleted", Markdown)
+    }
+
+suspend inline fun BehaviourContext.linksCommand() : Job =
+    onCommand("links") {
+        log("check links", it.chat)
+        var text = "";
+        text += "*ВТОРОЙ КУРС*\n"
+        text += "[очередь](https://docs.google.com/spreadsheets/d/1f2tmAL9QWZ2mf4x0VExjrJ0GwxfhJv6mnepjOQgEsTI/edit#gid=0)\n"
+        text += "[баллы](https://docs.google.com/spreadsheets/d/e/2PACX-1vQ52PnrWGnJHzy-KAde38XDw_EoEVBzAfAnHYVb_2Mr0x1LXGwgdXZNuNoA-YO01CA96MGbwu5BhSCL/pubhtml?gid=1330913863&single=true)\n"
+        text += "\n*ПЕРВЫЙ КУРС*\n"
+        text += "[очередь](https://docs.google.com/spreadsheets/d/1qA5bxy6orLWvjUrS88zQz5nGJOs_eq8zMtROmq-HV1U/view#gid=0)\n"
+        text += "[баллы](https://docs.google.com/spreadsheets/d/e/2PACX-1vTMff1WQpAk66EMnZyA3cUCQr_2scBkCLEJwwD7dYOmE1oI1XxOMgart8R0LjVj-39fnRi-lI8ixta2/pubhtml?gid=1001500460&single=true)\n"
+        sendTextMessage(it.chat, text, Markdown)
     }

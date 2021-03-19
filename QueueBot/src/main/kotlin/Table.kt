@@ -38,6 +38,24 @@ class Table(data : MutableList<MutableList<Any>>, shift1: Int = 0, shift2: Int =
             return Table(data!!)
         }
 
+        fun DMTable(course : Int) : Table? {
+            when (course) {
+                2 -> return DMTable()
+                1 -> {
+                    val data = SheetsQuickstart.getQueues(
+                        "1bght8Rl7-rY5G-VSY_3pVfQTa1Lvg07LlgKOnsUSl58",
+                        SheetsQuickstart.DM_LIST_NAME,
+                        "A4:A202"
+                    )
+                    if (data != null) {
+                        data[0].add(0, "Имена")
+                    }
+                    return Table(data!!)
+                }
+                else -> return null
+            }
+        }
+
         fun JAVATable() : Table? {
             val data = SheetsQuickstart.getQueues(
                 SheetsQuickstart.JAVA_SPREAD_SHEETS_ID,

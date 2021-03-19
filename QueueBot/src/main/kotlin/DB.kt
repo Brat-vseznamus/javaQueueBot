@@ -1,3 +1,4 @@
+import java.io.File
 import java.io.FileInputStream
 import java.sql.*
 import java.util.*
@@ -5,6 +6,7 @@ import java.util.*
 private const val USER_TABLE_NAME = "users"
 private const val NOTIFICATION_TABLE_NAME = "notifications"
 private const val DB_PROPERTIES_PATH = "build/resources/main/db.properties"
+//private const val DB_PROPERTIES_PATH = "QueueBot/src/main/resources/db.properties"
 
 class DB {
     private lateinit var connection: Connection
@@ -168,6 +170,22 @@ class DB {
         return list
     }
 
+    fun getAllUsers() : MutableList<MutableList<String>> {
+        val stmt = connection.createStatement()
+        val rs : ResultSet = stmt.executeQuery("SELECT * FROM $USER_TABLE_NAME")
+        var list = mutableListOf<MutableList<String>>()
+        while (rs.next()) {
+            list.add(
+                mutableListOf(
+                    rs.getString("USERTAG"),
+                    rs.getString("USERNAME"),
+                    rs.getInt("CHATID").toString(),
+                    rs.getInt("MUTE").toString()
+                    ));
+        }
+        return list
+    }
+
     fun getUserByProperty(propertyName : String, propertyValue : Any) : User? {
         val stmt = connection.createStatement()
         var request = "SELECT * FROM $USER_TABLE_NAME WHERE %s = %s"
@@ -200,6 +218,20 @@ class DB {
         }
         stmt.close()
         return status
+    }
+
+    fun printTable(file : File) {
+        val format = "| %-20s| %-40s| %-10s| %-4s |\n"
+        var text = ""
+        text += String.format("__%-20s__%-40s__%-10s__%-4s__\n", "_".repeat(20), "_".repeat(40), "_".repeat(10), "_".repeat(4))
+        text += String.format(format, "USERTAG", "USERNAME", "CHATID", "MUTE")
+        text += String.format("|-%-20s|-%-40s|-%-10s|-%4s-|\n", "-".repeat(20), "-".repeat(40), "-".repeat(10), "-".repeat(4))
+        val tb = getAllUsers();
+        for (row in tb) {
+            text += String.format(format, row[0], row[1], row[2], row[3])
+        }
+        text += String.format("|_%-20s|_%-40s|_%-10s|_%-4s_|", "_".repeat(20), "_".repeat(40), "_".repeat(10), "_".repeat(4))
+        file.writeText(text)
     }
 
 //    fun updateUserByProperty(propertyName : String, propertyValue : Any) : User? {
