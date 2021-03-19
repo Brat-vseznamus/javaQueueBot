@@ -39,10 +39,8 @@ suspend fun main(vararg args: String) {
 //    fun getTb() = SheetsQuickstart.getQueues("1EmM8619VtPPd5svGF-vuXNVDf6vImsucU3GTXwUi9NE", "Лист1", "A1:D6")
 //    var table = getTb()?.let { Table(it) }
 
-//    bot.execute(SendTextMessage(ChatId(420953808), "suka"))
-//    val file = File("build/resources/main/filename.txt")
 //    db.printTable(File("build/resources/main/filename.txt"))
-//    bot.execute(SendDocument(ChatId(420953808), MultipartFile(StorageFile(file))))
+//    bot.execute(SendDocument(ChatId(0), MultipartFile(StorageFile(file))))
 
 
     val getTb : () -> Spreadsheet? = {
